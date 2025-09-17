@@ -1,0 +1,55 @@
+﻿@{
+    ViewData["Title"] = "Dashboard";
+    var categoryTotals = ViewBag.CategoryTotals as List<ExpenseTracker.Controllers.DashboardController.CategoryTotal>;
+    var dailyTrend = ViewBag.DailyTrend as List<ExpenseTracker.Controllers.DashboardController.DailyTotal>;
+}
+
+<h2>Dashboard</h2>
+
+<div class="mb-3">
+    <h4>Total Expenses This Month: @ViewBag.TotalExpenses.ToString("C")</h4>
+</div>
+
+<h5>Expenses by Category</h5>
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Category</th>
+            <th>Total</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (categoryTotals != null)
+        {
+            foreach (var item in categoryTotals)
+            {
+                <tr>
+                    <td>@item.Category</td>
+                    <td>@item.Total.ToString("C")</td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>
+
+<h5>Daily Trend</h5>
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Date</th>
+            <th>Total</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (dailyTrend != null)
+        {
+            foreach (var day in dailyTrend)
+            {
+                <tr>
+                    <td>@day.Date.ToShortDateString()</td>
+                    <td>@day.Total.ToString("C")</td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>

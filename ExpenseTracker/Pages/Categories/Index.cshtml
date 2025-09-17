@@ -1,0 +1,47 @@
+﻿@page
+@model ExpenseTracker.Pages.Categories.IndexModel
+@{
+    ViewData["Title"] = "Categories";
+}
+
+<h1>Categories</h1>
+
+<p>
+    <a asp-page="Create" class="btn btn-primary"> Add Category</a>
+</p>
+
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>Category Name</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model.Categories != null && Model.Categories.Any())
+        {
+            foreach (var cat in Model.Categories)
+            {
+                <tr>
+                    <td>@cat.Name</td>
+                    <td>
+                    <td>
+                        <a asp-page="./Edit" asp-route-id="@cat.CategoryId" class="btn btn-light">Edit</a>
+                        <a asp-page="./Details" asp-route-id="@cat.CategoryId" class="btn btn-light">Details</a>
+                        <a asp-page="./Delete" asp-route-id="@cat.CategoryId" class="btn btn-light">Delete</a>
+
+
+                    </td>
+
+                    </td>
+                </tr>
+            }
+        }
+        else
+        {
+            <tr>
+                <td colspan="2" class="text-muted">No categories found.</td>
+            </tr>
+        }
+    </tbody>
+</table>

@@ -1,0 +1,45 @@
+﻿
+@page
+@model ExpenseTracker.Pages.Expenses.IndexModel
+@{
+    ViewData["Title"] = "Expenses";
+}
+
+<h1>Expenses</h1>
+
+<p>
+    <a class="btn btn-primary" asp-page="Create"> Add Expense</a>
+</p>
+
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>User</th>
+            <th>Amount</th>
+            <th>Date</th>
+            <th>Notes</th>
+            <th>Category</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var expense in Model.Expenses)
+        {
+            <tr>
+                <td>@expense.UserId</td>
+                <td>@expense.Amount.ToString("C")</td>
+                <td>@expense.ExpenseDate.ToShortDateString()</td>
+                <td>@expense.Notes</td>
+                <td>@expense.Category?.Name</td>
+                <td>
+                <td>
+                    <a asp-page="./Edit" asp-route-id="@expense.ExpenseId" class="btn btn-light">Edit</a>
+                    <a asp-page="./Details" asp-route-id="@expense.ExpenseId" class="btn btn-light">Details</a>
+                    <a asp-page="./Delete" asp-route-id="@expense.ExpenseId" class="btn btn-light">Delete</a>
+                </td>
+
+                </td>
+
+            </tr>
+        }
+    </tbody>
+</table>

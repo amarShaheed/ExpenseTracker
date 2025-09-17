@@ -1,0 +1,72 @@
+﻿@* @page *@
+@* @model IndexModel *@
+@* @{ *@
+@*     ViewData["Title"] = "Home page"; *@
+@* } *@
+
+@* <div class="text-center"> *@
+@*     <h1 class="display-4">Welcome</h1> *@
+@*     <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p> *@
+@* </div> *@
+@page
+@model ExpenseTracker.Pages.IndexModel
+@using Newtonsoft.Json
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<h1>Expense Dashboard</h1>
+
+<div class="alert alert-info">
+    <strong>Total Expenses This Month:</strong> @Model.TotalThisMonth.ToString("C")
+</div>
+
+<h3>Category Breakdown</h3>
+<table class="table table-striped">
+    <thead><tr><th>Category</th><th>Total</th></tr></thead>
+    <tbody>
+        @foreach (var item in Model.CategorySummary)
+        {
+            <tr><td>@item.Key</td><td>@item.Value.ToString("C")</td></tr>
+        }
+    </tbody>
+</table>
+
+<div class="row">
+    <div class="col-md-6">
+        <h3>Category Breakdown (Pie)</h3>
+        <canvas id="categoryChart"></canvas>
+    </div>
+    <div class="col-md-6">
+        <h3>Monthly Trends (Last 6 months)</h3>
+        <canvas id="monthlyChart"></canvas>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // category chart
+    var catLabels = @Html.Raw(JsonConvert.SerializeObject(Model.CategorySummary.Keys));
+    var catValues = @Html.Raw(JsonConvert.SerializeObject(Model.CategorySummary.Values));
+    var ctxCat = document.getElementById('categoryChart').getContext('2d');
+    new Chart(ctxCat, {
+        type: 'pie',
+        data: {
+            labels: catLabels,
+            datasets: [{ data: catValues }]
+        }
+    });
+
+    // monthly chart
+    var monthLabels = @Html.Raw(JsonConvert.SerializeObject(Model.MonthlyLabels));
+    var monthValues = @Html.Raw(JsonConvert.SerializeObject(Model.MonthlyTotals));
+    var ctxMonth = document.getElementById('monthlyChart').getContext('2d');
+    new Chart(ctxMonth, {
+        type: 'bar',
+        data: {
+            labels: monthLabels,
+            datasets: [{ label: 'Total', data: monthValues }]
+        },
+        options: { scales: { y: { beginAtZero: true } } }
+    });
+</script>
