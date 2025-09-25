@@ -1,6 +1,10 @@
-﻿using ExpenseTracker.Data;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using ExpenseTracker.Data;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace ExpenseTracker.Controllers
 {
@@ -17,33 +21,46 @@ namespace ExpenseTracker.Controllers
         {
             var startOfMonth = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
 
+            // Total Expenses
             var totalExpenses = await _context.Expenses
                 .Where(e => e.ExpenseDate >= startOfMonth)
                 .SumAsync(e => (decimal?)e.Amount) ?? 0;
 
+            // Category totals
             var categoryTotals = await _context.Expenses
                 .Include(e => e.Category)
                 .GroupBy(e => e.Category.Name)
-                .Select(g => new CategoryTotal { Category = g.Key, Total = g.Sum(e => e.Amount) })
-                .ToListAsync();
+                .Select(g => new CategoryTotal
+                {
+                    Category = g.Key,
+                    Total = g.Sum(e => e.Amount)
+                })
+                .ToListAsync() ?? new List<CategoryTotal>();
 
+            // Daily trend totals
             var dailyTrend = await _context.Expenses
                 .GroupBy(e => e.ExpenseDate.Date)
-                .Select(g => new DailyTotal { Date = g.Key, Total = g.Sum(e => e.Amount) })
+                .Select(g => new DailyTotal
+                {
+                    Date = g.Key,
+                    Total = g.Sum(e => e.Amount)
+                })
                 .OrderBy(d => d.Date)
-                .ToListAsync();
+                .ToListAsync() ?? new List<DailyTotal>();
 
-            // Pass values to the view
-            ViewBag.TotalExpenses = totalExpenses;
-            ViewBag.CategoryTotals = categoryTotals;
-            ViewBag.DailyTrend = dailyTrend;
+            var model = new DashboardViewModel
+            {
+                TotalExpenses = totalExpenses,
+                CategoryTotals = categoryTotals,
+                DailyTrend = dailyTrend
+            };
 
-            return View();
+            return View(model);
         }
 
         public class CategoryTotal
         {
-            public string Category { get; set; }
+            public string Category { get; set; } = string.Empty;
             public decimal Total { get; set; }
         }
 
@@ -51,6 +68,13 @@ namespace ExpenseTracker.Controllers
         {
             public DateTime Date { get; set; }
             public decimal Total { get; set; }
+        }
+
+        public class DashboardViewModel
+        {
+            public decimal TotalExpenses { get; set; }
+            public List<CategoryTotal> CategoryTotals { get; set; } = new();
+            public List<DailyTotal> DailyTrend { get; set; } = new();
         }
     }
 }

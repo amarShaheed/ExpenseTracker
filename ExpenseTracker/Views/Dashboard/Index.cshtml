@@ -1,55 +1,831 @@
-﻿@{
+﻿@* @{ *@
+@*     ViewData["Title"] = "Dashboard"; *@
+@*     var categoryTotals = ViewBag.CategoryTotals as List<ExpenseTracker.Controllers.DashboardController.CategoryTotal>; *@
+@*     var dailyTrend = ViewBag.DailyTrend as List<ExpenseTracker.Controllers.DashboardController.DailyTotal>; *@
+@* } *@
+
+@* <!-- ✅ Link Your Custom CSS --> *@
+@* <link rel="stylesheet" href="~/css/site.css" /> *@
+
+@* <div class="container mt-4"> *@
+@*     <h2 class="text-center mb-4">📊 Expense Dashboard</h2> *@
+
+@*     <!-- Summary Cards --> *@
+@*     <div class="row text-center"> *@
+@*         <div class="col-md-4 mb-3"> *@
+@*             <div class="card shadow-sm p-3"> *@
+@*                 <h5>Total Expenses</h5> *@
+@*                 <p class="display-6 text-danger">₹ 5,200</p> *@
+@*             </div> *@
+@*         </div> *@
+@*         <div class="col-md-4 mb-3"> *@
+@*             <div class="card shadow-sm p-3"> *@
+@*                 <h5>Top Category</h5> *@
+@*                 <p class="h4 text-primary">Shopping</p> *@
+@*             </div> *@
+@*         </div> *@
+@*         <div class="col-md-4 mb-3"> *@
+@*             <div class="card shadow-sm p-3"> *@
+@*                 <h5>Transactions</h5> *@
+@*                 <p class="h4 text-success">18</p> *@
+@*             </div> *@
+@*         </div> *@
+@*     </div> *@
+
+@*     <!-- Charts Row --> *@
+@*     <div class="row"> *@
+@*         <div class="col-md-6 mb-4"> *@
+@*             <div class="card p-3 shadow-sm"> *@
+@*                 <h5 class="text-center">Category Breakdown</h5> *@
+@*                 <canvas id="categoryChart"></canvas> *@
+@*             </div> *@
+@*         </div> *@
+@*         <div class="col-md-6 mb-4"> *@
+@*             <div class="card p-3 shadow-sm"> *@
+@*                 <h5 class="text-center">Monthly Trend</h5> *@
+@*                 <canvas id="trendChart"></canvas> *@
+@*             </div> *@
+@*         </div> *@
+@*     </div> *@
+
+@*     <!-- Add Expense Button --> *@
+@*     <div class="text-center mt-3"> *@
+@*         <a href="/Expenses/Create" class="btn btn-primary btn-lg">+ Add Expense</a> *@
+@*     </div> *@
+@* </div> *@
+
+@* <!-- ✅ Footer Section --> *@
+@* <footer class="footer border-top mt-5 bg-light"> *@
+@*     <div class="container text-center"> *@
+@*         <span class="text-muted">&copy; @DateTime.Now.Year - ExpenseTracker</span> *@
+@*     </div> *@
+@* </footer> *@
+
+@* <!-- ✅ Chart.js CDN --> *@
+@* <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> *@
+
+@* <!-- ✅ Chart Scripts --> *@
+@* <script> *@
+@*     // Sample Pie Chart *@
+@*     new Chart(document.getElementById('categoryChart'), { *@
+@*         type: 'pie', *@
+@*         data: { *@
+@*             labels: ['Shopping', 'Food', 'Bills'], *@
+@*             datasets: [{ *@
+@*                 data: [1200, 800, 400], *@
+@*                 backgroundColor: ['#ff6384', '#36a2eb', '#ffce56'] *@
+@*             }] *@
+@*         } *@
+@*     }); *@
+
+@*     // Sample Line Chart *@
+@*     new Chart(document.getElementById('trendChart'), { *@
+@*         type: 'line', *@
+@*         data: { *@
+@*             labels: ['Jan', 'Feb', 'Mar', 'Apr'], *@
+@*             datasets: [{ *@
+@*                 label: 'Expenses', *@
+@*                 data: [1500, 1800, 1200, 2000], *@
+@*                 borderColor: '#36a2eb', *@
+@*                 fill: false, *@
+@*                 tension: 0.3 *@
+@*             }] *@
+@*         } *@
+@*     }); *@
+@* </script> *@
+@model ExpenseTracker.Controllers.DashboardController.DashboardViewModel
+
+@{
     ViewData["Title"] = "Dashboard";
-    var categoryTotals = ViewBag.CategoryTotals as List<ExpenseTracker.Controllers.DashboardController.CategoryTotal>;
-    var dailyTrend = ViewBag.DailyTrend as List<ExpenseTracker.Controllers.DashboardController.DailyTotal>;
 }
 
-<h2>Dashboard</h2>
+<link rel="stylesheet" href="~/css/site.css" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 
-<div class="mb-3">
-    <h4>Total Expenses This Month: @ViewBag.TotalExpenses.ToString("C")</h4>
+<style>
+    /* Ensure styles are applied */
+    .dashboard-container {
+        position: relative;
+        min-height: 100vh;
+        padding: 2rem 1rem;
+        max-width: 1400px;
+        margin: 0 auto;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+
+    .bg-gradient-animated {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(-45deg, #667eea, #764ba2, #f093fb, #4facfe);
+        background-size: 400% 400%;
+        animation: gradientShift 15s ease infinite;
+        z-index: -1;
+    }
+
+    @@keyframes gradientShift {
+        0% {
+            background-position: 0% 50%;
+        }
+
+        50% {
+            background-position: 100% 50%;
+        }
+
+        100% {
+            background-position: 0% 50%;
+        }
+    }
+
+    .dashboard-header {
+        text-align: center;
+        margin-bottom: 3rem;
+    }
+
+    .header-content {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(20px);
+        border-radius: 20px;
+        padding: 2rem;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .header-icon {
+        width: 80px;
+        height: 80px;
+        background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1rem;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    }
+
+        .header-icon i {
+            font-size: 2rem;
+            color: #6366f1;
+        }
+
+    .gradient-text {
+        background: linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 1rem;
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 3rem;
+    }
+
+    .stat-card {
+        position: relative;
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(20px);
+        border-radius: 16px;
+        padding: 1.5rem;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+        .stat-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+        }
+
+    .card-primary::before {
+        background: linear-gradient(90deg, #667eea, #764ba2);
+    }
+
+    .card-success::before {
+        background: linear-gradient(90deg, #10b981, #059669);
+    }
+
+    .card-warning::before {
+        background: linear-gradient(90deg, #f59e0b, #d97706);
+    }
+
+    .card-danger::before {
+        background: linear-gradient(90deg, #ef4444, #dc2626);
+    }
+
+    .stat-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 1rem;
+        font-size: 1.5rem;
+        color: white;
+    }
+
+    .card-primary .stat-icon {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+    }
+
+    .card-success .stat-icon {
+        background: linear-gradient(135deg, #10b981, #059669);
+    }
+
+    .card-warning .stat-icon {
+        background: linear-gradient(135deg, #f59e0b, #d97706);
+    }
+
+    .card-danger .stat-icon {
+        background: linear-gradient(135deg, #ef4444, #dc2626);
+    }
+
+    .stat-label {
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: #64748b;
+        margin-bottom: 0.5rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .stat-value {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 0.5rem;
+    }
+
+    .charts-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+        gap: 2rem;
+        margin-bottom: 3rem;
+    }
+
+    .chart-card {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(20px);
+        border-radius: 16px;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+
+        .chart-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.15);
+        }
+
+    .chart-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1.5rem;
+        border-bottom: 1px solid #e2e8f0;
+        background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    }
+
+    .chart-title {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #1e293b;
+    }
+
+        .chart-title i {
+            color: #6366f1;
+        }
+
+    .chart-body {
+        padding: 1.5rem;
+    }
+
+    .chart-container {
+        position: relative;
+        height: 300px;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 3rem 1rem;
+        color: #64748b;
+    }
+
+        .empty-state i {
+            font-size: 3rem;
+            color: #cbd5e1;
+            margin-bottom: 1rem;
+        }
+
+        .empty-state p {
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+        }
+
+    /* Quick Actions */
+    .quick-actions {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(20px);
+        border-radius: 16px;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        padding: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    .section-title {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        color: #1e293b;
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+
+        .section-title i {
+            color: #6366f1;
+        }
+
+    .section-description {
+        color: #64748b;
+        font-size: 1rem;
+        margin-bottom: 2rem;
+    }
+
+    .action-cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .action-card {
+        background: #ffffff;
+        border-radius: 16px;
+        border: 2px solid #e2e8f0;
+        padding: 1.5rem;
+        text-align: center;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+        .action-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+            border-color: #6366f1;
+        }
+
+        .action-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+        }
+
+        .action-card.view-card::before {
+            background: linear-gradient(90deg, #3b82f6, #1d4ed8);
+        }
+
+        .action-card.add-card::before {
+            background: linear-gradient(90deg, #10b981, #059669);
+        }
+
+        .action-card.expense-card::before {
+            background: linear-gradient(90deg, #f59e0b, #d97706);
+        }
+
+    .action-icon-large {
+        width: 80px;
+        height: 80px;
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        color: white;
+        margin: 0 auto 1.5rem;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    }
+
+    .view-card .action-icon-large {
+        background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+    }
+
+    .add-card .action-icon-large {
+        background: linear-gradient(135deg, #10b981, #059669);
+    }
+
+    .expense-card .action-icon-large {
+        background: linear-gradient(135deg, #f59e0b, #d97706);
+    }
+
+    .action-title {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 0.75rem;
+    }
+
+    .action-description {
+        color: #64748b;
+        font-size: 0.95rem;
+        line-height: 1.6;
+        margin-bottom: 1.5rem;
+    }
+
+    .action-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 1rem 2rem;
+        border: none;
+        border-radius: 12px;
+        font-weight: 600;
+        text-decoration: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-size: 1rem;
+        min-width: 200px;
+        justify-content: center;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+        color: white;
+    }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #2563eb, #1e40af);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
+        }
+
+    .btn-success {
+        background: linear-gradient(135deg, #10b981, #059669);
+        color: white;
+    }
+
+        .btn-success:hover {
+            background: linear-gradient(135deg, #0891b2, #0f766e);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4);
+        }
+
+    .btn-warning {
+        background: linear-gradient(135deg, #f59e0b, #d97706);
+        color: white;
+    }
+
+        .btn-warning:hover {
+            background: linear-gradient(135deg, #eab308, #ca8a04);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(245, 158, 11, 0.4);
+        }
+
+    /* Animations */
+    .animate-fade {
+        opacity: 0;
+        transform: translateY(30px);
+        transition: all 0.8s ease;
+    }
+
+        .animate-fade.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+    /* Mobile Responsive */
+    @@media (max-width: 768px) {
+        .dashboard-container {
+            padding: 1rem;
+        }
+
+        .stats-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .charts-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .action-cards {
+            grid-template-columns: 1fr;
+        }
+
+        .action-btn {
+            min-width: auto;
+            width: 100%;
+        }
+    }
+</style>
+
+<div class="dashboard-container">
+    <!-- Animated Background -->
+    <div class="bg-gradient-animated"></div>
+
+    <!-- Dashboard Header -->
+    <div class="dashboard-header animate-fade">
+        <div class="header-content">
+            <div class="header-icon">
+                <i class="fas fa-chart-line"></i>
+            </div>
+            <h1 class="display-4 fw-bold gradient-text">
+                Expense Dashboard
+            </h1>
+            <p class="lead text-muted" style="color: rgba(255, 255, 255, 0.8) !important;">Track your spending, manage your budget, and achieve your goals</p>
+        </div>
+    </div>
+
+    <!-- Quick Stats Cards -->
+    <div class="stats-grid">
+        <div class="stat-card card-primary animate-fade">
+            <div class="stat-icon">
+                <i class="fas fa-wallet"></i>
+            </div>
+            <div class="stat-content">
+                <h6 class="stat-label">Total Expenses</h6>
+                <p class="stat-value">₹ @Model.TotalExpenses.ToString("N0")</p>
+            </div>
+        </div>
+
+        <div class="stat-card card-success animate-fade">
+            <div class="stat-icon">
+                <i class="fas fa-tags"></i>
+            </div>
+            <div class="stat-content">
+                <h6 class="stat-label">Top Category</h6>
+                <p class="stat-value">@Model.CategoryTotals.FirstOrDefault()?.Category ?? "N/A"</p>
+            </div>
+        </div>
+
+        <div class="stat-card card-warning animate-fade">
+            <div class="stat-icon">
+                <i class="fas fa-exchange-alt"></i>
+            </div>
+            <div class="stat-content">
+                <h6 class="stat-label">Transactions</h6>
+                <p class="stat-value">@Model.DailyTrend.Count</p>
+            </div>
+        </div>
+
+        <div class="stat-card card-danger animate-fade">
+            <div class="stat-icon">
+                <i class="fas fa-piggy-bank"></i>
+            </div>
+            <div class="stat-content">
+                <h6 class="stat-label">Budget Left</h6>
+                <p class="stat-value">₹ 4,580</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Section -->
+    <div class="charts-grid">
+        <!-- Category Breakdown -->
+        <div class="chart-card animate-fade">
+            <div class="chart-header">
+                <div class="chart-title">
+                    <i class="fas fa-chart-pie"></i>
+                    <span>Category Breakdown</span>
+                </div>
+            </div>
+            <div class="chart-body">
+                @if (Model.CategoryTotals.Any())
+                {
+                    <div class="chart-container">
+                        <canvas id="categoryChart"></canvas>
+                    </div>
+                }
+                else
+                {
+                    <div class="empty-state">
+                        <i class="fas fa-chart-pie"></i>
+                        <p>No category data available</p>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- Daily Trend -->
+        <div class="chart-card animate-fade">
+            <div class="chart-header">
+                <div class="chart-title">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Daily Trend</span>
+                </div>
+            </div>
+            <div class="chart-body">
+                @if (Model.DailyTrend.Any())
+                {
+                    <div class="chart-container">
+                        <canvas id="trendChart"></canvas>
+                    </div>
+                }
+                else
+                {
+                    <div class="empty-state">
+                        <i class="fas fa-chart-line"></i>
+                        <p>No transaction data available</p>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions Section -->
+    <div class="quick-actions animate-fade">
+        <h2 class="section-title">
+            <i class="fas fa-bolt"></i>
+            Quick Actions
+        </h2>
+        <p class="section-description">Manage your expenses and categories efficiently</p>
+
+        <div class="action-cards">
+            <!-- View Expenses Card -->
+            <div class="action-card view-card">
+                <div class="action-icon-large">
+                    <i class="fas fa-list-alt"></i>
+                </div>
+                <h3 class="action-title">View All Expenses</h3>
+                <p class="action-description">Browse and analyze all your expense records with detailed filtering and sorting options.</p>
+                <a href="/Expenses" class="action-btn btn-primary">
+                    <i class="fas fa-eye"></i>
+                    View Expenses
+                </a>
+            </div>
+
+            <!-- Add Category Card -->
+            <div class="action-card add-card">
+                <div class="action-icon-large">
+                    <i class="fas fa-plus-circle"></i>
+                </div>
+                <h3 class="action-title">Add New Category</h3>
+                <p class="action-description">Create new expense categories to better organize and track your spending patterns.</p>
+                <a href="/Categories/Create" class="action-btn btn-success">
+                    <i class="fas fa-plus"></i>
+                    Add Category
+                </a>
+            </div>
+
+            <!-- Add Expense Card -->
+            <div class="action-card expense-card">
+                <div class="action-icon-large">
+                    <i class="fas fa-wallet"></i>
+                </div>
+                <h3 class="action-title">Record New Expense</h3>
+                <p class="action-description">Quickly record a new expense with amount, category, date and description details.</p>
+                <a href="/Expenses/Create" class="action-btn btn-warning">
+                    <i class="fas fa-plus"></i>
+                    Add Expense
+                </a>
+            </div>
+        </div>
+    </div>
 </div>
 
-<h5>Expenses by Category</h5>
-<table class="table table-bordered">
-    <thead>
-        <tr>
-            <th>Category</th>
-            <th>Total</th>
-        </tr>
-    </thead>
-    <tbody>
-        @if (categoryTotals != null)
-        {
-            foreach (var item in categoryTotals)
-            {
-                <tr>
-                    <td>@item.Category</td>
-                    <td>@item.Total.ToString("C")</td>
-                </tr>
-            }
-        }
-    </tbody>
-</table>
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Initialize animations
+        setTimeout(() => {
+            document.querySelectorAll('.animate-fade').forEach(el => {
+                el.classList.add('show');
+            });
+        }, 100);
 
-<h5>Daily Trend</h5>
-<table class="table table-bordered">
-    <thead>
-        <tr>
-            <th>Date</th>
-            <th>Total</th>
-        </tr>
-    </thead>
-    <tbody>
-        @if (dailyTrend != null)
-        {
-            foreach (var day in dailyTrend)
-            {
-                <tr>
-                    <td>@day.Date.ToShortDateString()</td>
-                    <td>@day.Total.ToString("C")</td>
-                </tr>
-            }
-        }
-    </tbody>
-</table>
+        // Category Chart
+    @if (Model.CategoryTotals.Any())
+    {
+        <text>
+                    const categoryLabels = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.CategoryTotals.Select(c => c.Category)));
+                    const categoryData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.CategoryTotals.Select(c => c.Total)));
+
+                    new Chart(document.getElementById('categoryChart'), {
+                        type: 'doughnut',
+                        data: {
+                            labels: categoryLabels,
+                            datasets: [{
+                                data: categoryData,
+                                backgroundColor: ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4'],
+                                borderWidth: 0,
+                                hoverBorderWidth: 4,
+                                hoverBorderColor: '#ffffff'
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            cutout: '70%',
+                            plugins: {
+                                legend: {
+                                    position: 'bottom',
+                                    labels: {
+                                        padding: 20,
+                                        usePointStyle: true,
+                                        font: { size: 12, weight: '500' }
+                                    }
+                                },
+                                tooltip: {
+                                    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                                    titleColor: '#333',
+                                    bodyColor: '#666',
+                                    borderColor: '#e2e8f0',
+                                    borderWidth: 1,
+                                    cornerRadius: 8,
+                                    callbacks: {
+                                        label: function(context) {
+                                            const total = context.dataset.data.reduce((a,b)=>a+b,0);
+                                            const percentage = ((context.parsed/total)*100).toFixed(1);
+                                            return `₹ ${context.parsed.toLocaleString()} (${percentage}%)`;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    });
+        </text>
+    }
+
+        // Daily Trend Chart
+    @if (Model.DailyTrend.Any())
+    {
+        <text>
+                    const trendLabels = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.DailyTrend.Select(d => d.Date.ToString("dd MMM"))));
+                    const trendData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.DailyTrend.Select(d => d.Total)));
+
+                    const ctx = document.getElementById('trendChart').getContext('2d');
+                    const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+                    gradient.addColorStop(0, 'rgba(59, 130, 246, 0.2)');
+                    gradient.addColorStop(1, 'rgba(59, 130, 246, 0)');
+
+                    new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: trendLabels,
+                            datasets: [{
+                                label: 'Daily Expenses',
+                                data: trendData,
+                                borderColor: '#3b82f6',
+                                backgroundColor: gradient,
+                                fill: true,
+                                tension: 0.4,
+                                pointRadius: 6,
+                                pointHoverRadius: 8,
+                                pointBackgroundColor: '#ffffff',
+                                pointBorderColor: '#3b82f6',
+                                pointBorderWidth: 3
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    grid: { color: 'rgba(0, 0, 0, 0.05)' },
+                                    ticks: { color: '#64748b' }
+                                },
+                                x: {
+                                    grid: { color: 'rgba(0, 0, 0, 0.05)' },
+                                    ticks: { color: '#64748b' }
+                                }
+                            },
+                            plugins: {
+                                legend: { display: false },
+                                tooltip: {
+                                    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                                    titleColor: '#333',
+                                    bodyColor: '#666',
+                                    borderColor: '#e2e8f0',
+                                    borderWidth: 1,
+                                    cornerRadius: 8
+                                }
+                            }
+                        }
+                    });
+        </text>
+    }
+    });
+</script>

@@ -15,10 +15,10 @@
     <thead>
         <tr>
             <th>User</th>
-            <th>Amount</th>
             <th>Date</th>
-            <th>Notes</th>
             <th>Category</th>
+            <th>Notes</th>
+            <th>Amount</th>
         </tr>
     </thead>
     <tbody>
@@ -26,10 +26,10 @@
         {
             <tr>
                 <td>@expense.UserId</td>
-                <td>@expense.Amount.ToString("C")</td>
                 <td>@expense.ExpenseDate.ToShortDateString()</td>
-                <td>@expense.Notes</td>
                 <td>@expense.Category?.Name</td>
+                <td>@expense.Notes</td>
+                <td>@expense.Amount.ToString("C")</td>
                 <td>
                 <td>
                     <a asp-page="./Edit" asp-route-id="@expense.ExpenseId" class="btn btn-light">Edit</a>

@@ -17,6 +17,7 @@
 using Microsoft.EntityFrameworkCore;
 using ExpenseTracker.Models;  // adjust if namespace is different
 
+
 namespace ExpenseTracker.Data
 {
     public class ApplicationDbContext : DbContext
@@ -28,6 +29,7 @@ namespace ExpenseTracker.Data
 
         public DbSet<Category> Categories { get; set; }
         public DbSet<Expense> Expenses { get; set; }
+
 
         // 🔽 Add this method here
         protected override void OnModelCreating(ModelBuilder modelBuilder)

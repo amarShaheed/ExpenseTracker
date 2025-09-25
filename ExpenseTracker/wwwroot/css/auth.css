@@ -1,0 +1,126 @@
+﻿/* Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Auth Container */
+.form-container {
+    background: #fff;
+    padding: 2.5rem;
+    border-radius: 20px;
+    box-shadow: 0px 15px 35px rgba(0, 0, 0, 0.15);
+    width: 100%;
+    max-width: 420px;
+    text-align: center;
+    animation: fadeInUp 0.8s ease-out;
+}
+
+    .form-container h2 {
+        margin-bottom: 1.5rem;
+        color: #5b21b6;
+        font-weight: 700;
+    }
+
+    /* Input Fields */
+    .form-container input {
+        width: 100%;
+        padding: 12px 14px;
+        margin: 10px 0;
+        border-radius: 10px;
+        border: 1px solid #ddd;
+        outline: none;
+        font-size: 14px;
+        transition: all 0.3s ease;
+    }
+
+        .form-container input:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 5px rgba(102, 126, 234, 0.4);
+        }
+
+/* Password toggle eye button */
+.password-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+    .password-wrapper input {
+        padding-right: 40px;
+    }
+
+.password-toggle {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #888;
+    font-size: 16px;
+}
+
+/* Button */
+.form-container button {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 25px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    margin-top: 15px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+    .form-container button:hover {
+        opacity: 0.9;
+        transform: translateY(-2px);
+    }
+
+/* Footer links */
+.form-footer {
+    margin-top: 1rem;
+    font-size: 14px;
+}
+
+    .form-footer a {
+        color: #764ba2;
+        text-decoration: none;
+        font-weight: 600;
+    }
+
+        .form-footer a:hover {
+            text-decoration: underline;
+        }
+
+/* Animations */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+    .form-container {
+        padding: 2rem 1.5rem;
+    }
+}
